@@ -4,6 +4,7 @@
 using namespace std;
 //CRT_SECURE_NO_WARNINGS!
 
+
 //definire clasa
 class Student {
 	//private continut vizibil doar in clasa, ca sa vedem continutul variabilelor private avem nevoie de metode get/set;
@@ -13,7 +14,7 @@ class Student {
 	//protected <=>public PENTRU CLASE MOSTENITE
 private:
 	//zona inaccesibila!
-	const int id;
+	const int id; //const: odata initializat nu se mai schimba
 	static int contor; //static arata un comportament al clasei;o sa initializez id-ului studentului cu ajutorul acestui contor
 	string nume; //<=>char*
 	char dataNastere[11]; // 12.12.2012
@@ -57,7 +58,7 @@ public:
 	Student(string num, const char data[11], char g, float burs, int nr, int* nt, bool prez[5]) :id(contor++) { //id-ul este initializat pe baza campului static
 		//fiecare camp din clasa va fi initializat cu valoarea din apelul constructorului
 		//exemplu de validare pe string, se poate folosi/ exclude
-		if (num.length()) {//daca exista num atunci initializez campul
+		if (num.length()>0) {//daca exista num atunci initializez campul
 			nume = num;
 		}
 		strcpy(dataNastere, data);
@@ -68,7 +69,7 @@ public:
 		}
 
 		//exemplu de validare pentru float bursa (sa fie mai mare decat zero)
-		if (burs) {
+		if (burs>0) {
 			bursa = burs;
 		}
 		nrNote = nr;
@@ -81,7 +82,6 @@ public:
 		}
 
 		cout << "S-a apelat constructorul cu parametri" << endl;
-
 	}
 
 	
@@ -149,8 +149,72 @@ public:
 		return *this; //returnez obiectul cu noile valori
 	}
 
-
-
+	
+	//FUNCTII ACCESOR/ METODE GET/SET (sunt functii membre => primesc THIS)
+	string getNume() {
+		return nume;
+	}
+	char* getDataNastere() {
+		return dataNastere;
+	}
+	char getGen() {
+		return gen;
+	}
+	float getBursa() {
+		return bursa;
+	}
+	int* getNote() {
+		return note;
+	}
+	int getNrNote() {
+		return nrNote;
+	}
+	bool* getPrezente() {
+		return prezente;
+	}
+	
+	void setNume(string numeNou) {
+		if (numeNou.length() > 0) {
+			nume = numeNou;
+		}
+	}
+	void setDataNastere(const char dataNoua[11]) {
+		if (strlen(dataNoua) == 10) {
+			strcpy(dataNastere, dataNoua);
+		}
+	}
+	void setGen(char genNou) {
+		if (genNou == 'm' || genNou == 'f') {
+			gen = genNou;
+		}
+	}
+	void setBursa(float bursaNoua) {
+		if (bursaNoua > 0) {
+			bursa = bursaNoua;
+		}
+	}
+	//numarul de note + notele se seteaza impreuna
+	void setNote(int nrNou, int* noteNoi) {
+		if (nrNou > 0) {
+			nrNote = nrNou;
+			if (note) {
+				delete[] note; //sterg vechile note
+			}
+			note = new int[nrNou]; //aloc memorie
+			for (int i = 0; i < nrNou; i++) {
+				note[i] = noteNoi[i]; //creez noul vector de note
+			}
+		}
+	}
+	void setPrezente(bool prezNoi[5]) {
+		for (int i = 0; i < 5; i++) {
+			prezente[i] = prezNoi[i];
+		}
+	}
+	
+	
+	
+	
 	//DESTRUCTOR
 	//dezaloca acele campuri cu * pentru a evita MEMORY LEAKS
 	~Student() {
@@ -175,4 +239,20 @@ int main()
 	Student s3(s2); //creez un obiect s3 care este de fapt copia lui s2
 	//Operator =
 	s1 = s2; //pe s1 il fac ca pe s2; s1 si s2 sunt obiecte deja existente!
+	//Test accesor
+	Student accesor;
+	accesor.setNume("NumeSetat"); cout<<accesor.getNume()<<endl;
+	accesor.setDataNastere("15.05.2001"); cout<<accesor.getDataNastere()<<endl;
+	accesor.setGen('f'); cout << accesor.getGen() << endl;
+	accesor.setNote(5, new int[5]{ 10,10,10,10,10 }); 
+	cout << accesor.getNote() << endl; //ne da adresa la care este vectorul 
+	//pt continut este nevoie de for
+	for (int i = 0; i < accesor.getNrNote(); i++) {
+		cout << "Nota " << i + 1 << " este: " << accesor.getNote()[i] << endl;
+	}
+	accesor.setBursa(1000); cout << accesor.getBursa();
+	accesor.setPrezente(new bool[5]{ 1,1,0,1,1 });
+	for (int i = 0; i < 5; i++) {
+		cout << accesor.getPrezente()[i] << endl;
+	}
 }

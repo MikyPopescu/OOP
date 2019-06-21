@@ -126,8 +126,38 @@ public:
 		cout << "S-a apelat constructorul de copiere" << endl;
 	}
 
+	//OPERATOR =
+	//Egalare intre obiecte il fac pe s1 ca pe s2
+	//identic cu constructorul de copiere doar ca trebuie sa golesc campurile dinamice!
+	//Apel s1=s2
+	Student& operator=(const Student & sursa) {//semnatura este mereu la fel
+		if (note) {
+			delete[] note;
+		}
+		nume = sursa.nume;
+		strcpy(dataNastere, sursa.dataNastere);
+		gen = sursa.gen;
+		nrNote = sursa.nrNote;
+		bursa = sursa.bursa;
+		note = new int[sursa.nrNote];
+		for (int i = 0; i < sursa.nrNote; i++) {
+			note[i] = sursa.note[i];
+		}
+		for (int i = 0; i < 5; i++) {
+			prezente[i] = sursa.prezente[i];
+		}
+		return *this; //returnez obiectul cu noile valori
+	}
 
 
+
+	//DESTRUCTOR
+	//dezaloca acele campuri cu * pentru a evita MEMORY LEAKS
+	~Student() {
+		if (note) {
+			delete[] note;
+		}
+	}
 };
 int Student::contor = 0; //ATRIBUTUL STATIC SE INITIALIZEAZA MEREU AICI
 int main()
@@ -143,5 +173,6 @@ int main()
 	Student s2("Dorel", 3, new int[3]{ 7,8,5 });
 	//constructor de copiere
 	Student s3(s2); //creez un obiect s3 care este de fapt copia lui s2
-
+	//Operator =
+	s1 = s2; //pe s1 il fac ca pe s2; s1 si s2 sunt obiecte deja existente!
 }

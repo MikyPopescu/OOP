@@ -24,7 +24,8 @@ private:
 	bool prezente[5];  //Luni-Vineri
 
 public:
-	//orice functie membra in clasa primeste implicit THIS (pointer care retine adresa obiectului pt care s-a apelat); eu nu il mai scriu, e pierdere de timp ;)
+	//orice functie membra in clasa primeste implicit THIS (pointer care retine adresa obiectului pt care s-a apelat); 
+	//eu nu il mai scriu, e pierdere de timp ;)
 	//CONSTRUCTOR DEFAULT/ FARA PARAMETRI
 	//apel in main: Student s;
 	Student() :id(-1) {   //initializare atribut constant cu -1, in acest constructor nu folosesc Staticul
@@ -36,6 +37,7 @@ public:
 		//initializare caracter
 		gen = 'n';
 		//initializare valoare numerica
+		bursa = 0;
 		nrNote = 0;
 		//initializare vector dinamic
 		note = NULL;
@@ -48,6 +50,7 @@ public:
 
 	}
 
+	
 	//CONSTRUCTOR CU TOTI PARAMETRII
 	//apel in main: Student s1("Nume","12.12.2012",'M',...)
 	//am folosit const char data pentru ca in main, in VS 2017 nu merge sa bagi un sir de caractere pur si simplu; daca se scoate const-ul apelul nu mai merge
@@ -79,8 +82,52 @@ public:
 
 		cout << "S-a apelat constructorul cu parametri" << endl;
 
-
 	}
+
+	
+	//CONSTRUCTOR CU NUMAR VARIABIL DE PARAMETRII (ex: nume, nr de note si notele)
+	//Apel main: Student s2("Dorel,3,new int [3]{7,5,8})
+	Student(string num, int nr, int* nt):id(contor++) {
+		//toate campurile trebuie initializate (copy-paste de la construcotorul default pentru campurile care nu sunt in lista de parametrii a constr), altfel compilatorul va arunca din memorie valori 
+		//nu mai folosesc validari, dar se pot folosi ;)
+		nume = num;
+		strcpy(dataNastere, "00.00.0000");
+		gen = 'n';
+		nrNote = nr;
+		bursa = 0;
+		note = new int[nr]; 
+		for (int i = 0; i < nr; i++) {
+			note[i] = nt[i];
+		}
+		for (int i = 0; i < 5; i++) {
+			prezente[i] = false; 
+		}
+		cout << "S-a apelat constructorul cu 3 param"<<endl;
+	}
+
+	
+	//CONSTRUCTOR DE COPIERE
+	//Creez un obiect pe baza unui alt obiect DEJA EXISTENT
+	//Apel main: Student s3(s2) sau Student s3=s2;
+	Student(const Student& sursa):id(sursa.id) { //semnatura este mereu asa ; id-ul este preluat de la obiectul pe care il copiez
+		//se pot folosi validarile din constructorul cu parametri si aici (in loc de atributele constructorului se va folosi "sursa."->ia din obiectul sursa si construieste obiectul copiat)
+		nume = sursa.nume;
+		strcpy(dataNastere, sursa.dataNastere);
+		gen = sursa.gen;
+		nrNote = sursa.nrNote;
+		bursa = sursa.bursa;
+		note = new int[sursa.nrNote];
+		for (int i = 0; i < sursa.nrNote; i++) {
+			note[i] = sursa.note[i];
+		}
+		for (int i = 0; i < 5; i++) {
+			prezente[i] = sursa.prezente[i];
+		}
+		cout << "S-a apelat constructorul de copiere" << endl;
+	}
+
+
+
 };
 int Student::contor = 0; //ATRIBUTUL STATIC SE INITIALIZEAZA MEREU AICI
 int main()
@@ -92,4 +139,9 @@ int main()
 	int vectorNote[2] = { 7,8 };
 	bool vectorPrez[5] = { 1,1,1,0,0 };
 	Student s1("Gigel", "10.10.2003", 'M', 345, 2, vectorNote, vectorPrez); ///"10.10.2003" apare cu eroare daca scot constul din constructor
+	//apel constructor cu nr variabil de param
+	Student s2("Dorel", 3, new int[3]{ 7,8,5 });
+	//constructor de copiere
+	Student s3(s2); //creez un obiect s3 care este de fapt copia lui s2
+
 }

@@ -212,9 +212,73 @@ public:
 		}
 	}
 	
+	//OPERATOR <<
+	//Apel in main: cout<<s1
+	friend ostream& operator<<(ostream& out, Student& sursa) { //friend anuleaza this
+		out << "Cod: " << sursa.id << endl;
+		out << "Nume: " << sursa.nume << endl;
+		out << "Data nastere: " << sursa.dataNastere << endl;
+		if (sursa.gen == 'f') {
+			out << "Gen: feminin" << endl;
+		}
+		else if(sursa.gen=='m'){
+			out << "Gen: masculin" << endl;
+		}
+		else {
+			out << "Gen: nedefinit"<<endl;
+		}
+		out << "Bursa: " << sursa.bursa << " ron" << endl;
+		out << "Numar note: " << sursa.nrNote << endl;
+		for (int i = 0; i < sursa.nrNote; i++) {
+			out << "Nota " << i + 1 << " este " << sursa.note[i] << endl;
+		}
+		for (int i = 0; i < 5; i++) {
+			if (sursa.prezente[i] == 0) {
+				out << "Ziua " << i + 1 << ": Absent" << endl;
+			}
+			else {
+				out << "Ziua " << i + 1 << ": Prezent" << endl;
+			}
+		}
+		return out;
+	}
 	
-	
-	
+	//OPERATOR >>
+	//Apel in main: cin>>s1;
+	//CITIRI STRING/CHAR CU SPATII: getline(in, VAR_STRING);/in.getline(VAR_CHAR, 20);
+	friend istream& operator>>(istream& in, Student& sursa) {
+		cout << "Introduceti nume: ";
+		getline(in, sursa.nume);
+		//in.getline(sursa.nume,50);
+
+		cout << "Introduceti data nastere: ";
+		in >> sursa.dataNastere;
+
+		cout << "Introduceti gen: ";
+		in >> sursa.gen;
+
+		cout << "Introduceti bursa: ";
+		in >> sursa.bursa;
+
+		cout << "Introduceti nr de note: ";
+		in >> sursa.nrNote;
+
+		//in cazul in care exista note in vector, acestea se sterg
+		if (sursa.note) {
+			delete[] sursa.note;
+		}
+		sursa.note = new int[sursa.nrNote];
+		for (int i = 0; i < sursa.nrNote; i++) {
+			cout << "Introdu nota " << i + 1 << ": ";
+			in >> sursa.note[i];
+		}
+
+		for (int i = 0; i < 5; i++) {
+			cout << "Introdu prezenta: " << i + 1 << ": ";
+			in >> sursa.prezente[i];
+		}
+		return in;
+	}
 	//DESTRUCTOR
 	//dezaloca acele campuri cu * pentru a evita MEMORY LEAKS
 	~Student() {
@@ -233,12 +297,16 @@ int main()
 	int vectorNote[2] = { 7,8 };
 	bool vectorPrez[5] = { 1,1,1,0,0 };
 	Student s1("Gigel", "10.10.2003", 'M', 345, 2, vectorNote, vectorPrez); ///"10.10.2003" apare cu eroare daca scot constul din constructor
-	//apel constructor cu nr variabil de param
+	
+    //apel constructor cu nr variabil de param
 	Student s2("Dorel", 3, new int[3]{ 7,8,5 });
+	
 	//constructor de copiere
 	Student s3(s2); //creez un obiect s3 care este de fapt copia lui s2
+	
 	//Operator =
 	s1 = s2; //pe s1 il fac ca pe s2; s1 si s2 sunt obiecte deja existente!
+	
 	//Test accesor
 	Student accesor;
 	accesor.setNume("NumeSetat"); cout<<accesor.getNume()<<endl;
@@ -255,4 +323,14 @@ int main()
 	for (int i = 0; i < 5; i++) {
 		cout << accesor.getPrezente()[i] << endl;
 	}
+
+	//apel operator <<
+	Student s4("Ionel", "10.10.2000", 'M', 500, 2, vectorNote, vectorPrez);
+	cout << s4;
+
+	//apel operator>>
+	Student s5;
+	cin >> s5;
+	cout << s5;
+
 }

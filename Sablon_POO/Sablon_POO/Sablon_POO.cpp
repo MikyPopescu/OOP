@@ -279,6 +279,106 @@ public:
 		}
 		return in;
 	}
+
+	//exemple de functii pt examen
+	//minimul din vector
+	int notaMin() {
+		int min = note[0];
+		for (int i = 0; i < nrNote; i++) {
+			if (note[i] < min) {
+				min = note[i];
+			}
+		}
+		return min;
+	}
+	//maximul din vector
+	int notaMax() {
+		int max = note[0];
+		for (int i = 0; i < nrNote; i++) {
+			if (note[i] > max) {
+				max = note[i];
+			}
+		}
+		return max;
+	}
+	//sortarea vectorului de note
+	void sorteazaCrescator() {
+		int aux;
+		for (int i = 0; i < nrNote; i++) {
+			for (int j = i + 1; j < nrNote; j++) {
+				if (note[i] > note[j]) {
+					aux = note[i];
+					note[i] = note[j];
+					note[j] = aux;
+				}
+			}
+		}
+	}
+	void sorteazaDescrescator() {
+		int aux;
+		for (int i = 0; i < nrNote; i++) {
+			for (int j = i + 1; j < nrNote; j++) {
+				if (note[i] < note[j]) {
+					aux = note[i];
+					note[i] = note[j];
+					note[j] = aux;
+				}
+			}
+		}
+	}
+	//media din vectorul de note 
+	float media() {
+		float S = 0;
+		for (int i = 0; i < nrNote; i++) {
+			S += note[i];
+		}
+		return (float)S / nrNote;
+	}
+
+	//OPERATORI
+	//Operatori BINARI: *, /, +, -
+	//Pot sa adun doi studenti sau un student cu un numar
+	//LUCREAZA CU O COPIE SI RETURNEAZA MEREU O COPIE
+	
+	//s1+ceva
+	Student operator+(float b) {
+		Student copie = *this;
+		copie.bursa += b; //maresc valoarea bursei
+		return copie;
+	}
+
+	//ceva+s1
+	friend Student operator+(float b, Student& sursa) {
+		Student copie = sursa;
+		copie.bursa += b;
+		return copie;
+	}
+	
+	//Operatori unari: *=,+=,/=,-=
+	//Fac aceleasi lucruri ca si cei binari doar ca lucreaza pe obiectul original
+	//s1 += 50;
+	Student operator+=(float b) {
+		bursa = bursa + b;
+		return *this;
+	}
+
+	//Operatori post incrementare
+	//Aduna/scad, implicit nu au parametrii
+	//Fac o copie apoi modifica obiectul original si returneaza copia
+	//s1++;
+	Student operator++(int) { //punem int ca sa faca compilatorul diferenta intre pre si post incrementare
+		Student copie = *this;
+		bursa += 100; //maresc bursa cu 100
+		return copie;
+	}
+
+	//Operatori pre incrementare
+	//Lucreaza cu obiectul original si returneaza obiectul original
+	//++s1
+	Student operator++() {
+	    bursa += 100;
+		return *this;
+	}
 	//DESTRUCTOR
 	//dezaloca acele campuri cu * pentru a evita MEMORY LEAKS
 	~Student() {
@@ -330,7 +430,21 @@ int main()
 
 	//apel operator>>
 	Student s5;
-	cin >> s5;
-	cout << s5;
+	//cin >> s5;
+	//cout << s5;
+
+	//APELURI FUNCTII
+	int min = s4.notaMin(); cout << "Cea mai mica nota a studentului este: " << min << endl;
+	int max = s4.notaMax(); cout << "Cea mai mare nota a studentului este: " << max<<endl;
+	s4.sorteazaDescrescator();
+	cout << s4.media();
+
+	//Operatori
+	s4 + 50;
+	100 + s4;
+	s4 += 30;
+	s4++;
+	++s4;
+	
 
 }

@@ -1,5 +1,7 @@
 # OOP
 Program generic pentru a intelege fundamentele de POO (CSIE ANUL 2 SEM 1)
+
+
 Continut:
 1. Definirea clasei (incapsulare, atribute constante/statice/numerice/dinamice)
 2. Constructori (fara parametrii, cu toti parametrii, cu numar variabil de parametrii, constructor de copiere)

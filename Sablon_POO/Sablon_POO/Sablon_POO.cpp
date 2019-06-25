@@ -213,8 +213,11 @@ public:
 	}
 	
 	//OPERATOR <<
+	//tipul returnat: ostream& flux de date (string,float etc), punem & ca sa nu faca o copie pe care sa lucreze
+	//parametrii: ostream& out - alt flux de date unde salvez, sursa - obiectul de unde copiez (poate lipsi & deoarece am constructor de copiere)
+	//friend anuleaza this
 	//Apel in main: cout<<s1
-	friend ostream& operator<<(ostream& out, Student& sursa) { //friend anuleaza this
+	friend ostream& operator<<(ostream& out, Student& sursa) {
 		out << "Cod: " << sursa.id << endl;
 		out << "Nume: " << sursa.nume << endl;
 		out << "Data nastere: " << sursa.dataNastere << endl;
@@ -379,6 +382,82 @@ public:
 	    bursa += 100;
 		return *this;
 	}
+
+	//CAST explicit
+	//apel: tip variabila=(tip)s4
+	explicit operator float() {
+		return bursa;
+	}
+
+	//CAST implicit
+	//apel: float bursa=s4
+	/*
+	operator float(){
+	return bursa;
+	}
+	*/
+
+	//operator functie () -- face orice vrei sa faca  
+	//apel: s4(parametru_daca_exista)
+	//pun o nota noua in vectorul de note
+	void operator()(int nr) {
+		if (nr >= 1 && nr <= 10) {
+			int * vectorNou = new int[nrNote + 1];
+			for (int i = 0; i < nrNote; i++) {
+				vectorNou[i] = note[i];
+			}
+			vectorNou[nrNote] = nr;
+			if (note) {
+				delete[]note;
+			}
+			note = vectorNou;
+
+			nrNote++;
+		}
+	}
+
+	//operator index[]
+	//Apel: s[1];
+	int& operator[](int index) {
+		if (index >= 0 && index < nrNote && note != NULL) {
+			return note[index];
+		}
+		//else {
+		//	//exceptie sau
+		//	cout << "Index out of range!";
+		//}
+	}
+
+	//Operatori de comparatie: <,>, <=,>=, ==, !=, !
+	//Apel: if(s1<s2) => s1 mai mic else=> s2 mai mic
+	bool operator<(Student & sursa) {
+		float s = 0;
+		for (int i = 0; i < nrNote; i++) {
+			s += note[i];
+		}
+		s = s / nrNote;
+
+		float s1 = 0;
+		for (int i = 0; i < sursa.nrNote; i++) {
+			s1 += sursa.note[i];
+		}
+		s1 = s1 / sursa.nrNote;
+		if (s < s1) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	bool operator==(Student& sursa) {
+		if (strcmp(dataNastere, sursa.dataNastere) == 0) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 	//DESTRUCTOR
 	//dezaloca acele campuri cu * pentru a evita MEMORY LEAKS
 	~Student() {
@@ -445,6 +524,20 @@ int main()
 	s4 += 30;
 	s4++;
 	++s4;
-	
-
+	float bursa = (float)s4;
+	//float bursa=s4;
+	s4(8);
+	s4[3];
+	if (s1 < s2) {
+		cout << "Media lui s1 este mai mica decat media lui s2";
+	}
+	else {
+		cout << "Media lui s2 este mai mica decat media lui s1";
+	}
+	if (s3 == s4) {
+		cout << "Aceeasi data de nastere!";
+	}
+	else {
+		cout << "Diferite!";
+	}
 }

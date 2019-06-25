@@ -494,24 +494,30 @@ public:
 	}
 	
 
-	//citire din fisier txt
+	//citire din fisier txt (trebuie sa existe in folderul proiectului)
 	//copiez continutul operatorului >> si modific istream=> ifstream
 	//#include<fstream>
+	//ATENTIE: in fisier trebuie sa fie datele fara text aditional pe linii diferite
+	//Fisierul:
+	//Gigel
+	//15.03.1998
+	//M
+	//780
+	//4
+	//10 
+	//9 
+	//8 
+	//7
+	//1
+	//1 
+	//1 
+	//1 
+	//1
 	friend ifstream& operator>>(ifstream& in, Student& sursa) {
-		cout << "Introduceti nume: ";
 		getline(in, sursa.nume);
-		//in.getline(sursa.nume,50);
-
-		cout << "Introduceti data nastere: ";
-		in >> sursa.dataNastere;
-
-		cout << "Introduceti gen: ";
+		in.getline(sursa.dataNastere, 11);
 		in >> sursa.gen;
-
-		cout << "Introduceti bursa: ";
 		in >> sursa.bursa;
-
-		cout << "Introduceti nr de note: ";
 		in >> sursa.nrNote;
 
 		if (sursa.note) {
@@ -519,12 +525,10 @@ public:
 		}
 		sursa.note = new int[sursa.nrNote];
 		for (int i = 0; i < sursa.nrNote; i++) {
-			cout << "Introdu nota " << i + 1 << ": ";
 			in >> sursa.note[i];
 		}
 
 		for (int i = 0; i < 5; i++) {
-			cout << "Introdu prezenta: " << i + 1 << ": ";
 			in >> sursa.prezente[i];
 		}
 		return in;
@@ -627,18 +631,17 @@ int main()
 	//fisierul apare in folderul proiectului
 
 
-	//Bucla infinita undeva
-	////citire din fisierul creat mai sus
-	//ifstream obiectCitire;
-	//obiectCitire.open(numeFisier, ios::in);
-	//cout << "Citire din fisier text " << endl;
-	//if (obiectCitire.is_open()) {
-	//	while (!obiectCitire.eof()) {
-	//		Student student;
-	//		obiectCitire >> student;
-	//		cout << student;
-	//	}
-	//
-	//}
-	//obiectCitire.close();
+	//citire din fisier txt
+	ifstream obiectCitire;
+	obiectCitire.open("fisierCreatDeMine.txt", ios::in);
+	cout << "Citire din fisier text " << endl;
+	if (obiectCitire.is_open()) {
+		while (!obiectCitire.eof()) {
+			Student student;
+			obiectCitire >> student;
+			cout << student;
+		}
+	
+	}
+	obiectCitire.close();
 }

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <iostream>
 #include<string>
+#include<fstream> //pt fisier txt
 using namespace std;
 //CRT_SECURE_NO_WARNINGS!
 
@@ -458,6 +459,77 @@ public:
 			return false;
 		}
 	}
+
+
+	//afisare in fisier txt
+	//copiez continutul operatorului << si modific ostream => ofstream
+	//#include<fstream>
+	friend ofstream& operator<<(ofstream& out, Student& sursa) {
+		out << "Cod: " << sursa.id << endl;
+		out << "Nume: " << sursa.nume << endl;
+		out << "Data nastere: " << sursa.dataNastere << endl;
+		if (sursa.gen == 'f') {
+			out << "Gen: feminin" << endl;
+		}
+		else if (sursa.gen == 'm') {
+			out << "Gen: masculin" << endl;
+		}
+		else {
+			out << "Gen: nedefinit" << endl;
+		}
+		out << "Bursa: " << sursa.bursa << " ron" << endl;
+		out << "Numar note: " << sursa.nrNote << endl;
+		for (int i = 0; i < sursa.nrNote; i++) {
+			out << "Nota " << i + 1 << " este " << sursa.note[i] << endl;
+		}
+		for (int i = 0; i < 5; i++) {
+			if (sursa.prezente[i] == 0) {
+				out << "Ziua " << i + 1 << ": Absent" << endl;
+			}
+			else {
+				out << "Ziua " << i + 1 << ": Prezent" << endl;
+			}
+		}
+		return out;
+	}
+	
+
+	//citire din fisier txt
+	//copiez continutul operatorului >> si modific istream=> ifstream
+	//#include<fstream>
+	friend ifstream& operator>>(ifstream& in, Student& sursa) {
+		cout << "Introduceti nume: ";
+		getline(in, sursa.nume);
+		//in.getline(sursa.nume,50);
+
+		cout << "Introduceti data nastere: ";
+		in >> sursa.dataNastere;
+
+		cout << "Introduceti gen: ";
+		in >> sursa.gen;
+
+		cout << "Introduceti bursa: ";
+		in >> sursa.bursa;
+
+		cout << "Introduceti nr de note: ";
+		in >> sursa.nrNote;
+
+		if (sursa.note) {
+			delete[] sursa.note;
+		}
+		sursa.note = new int[sursa.nrNote];
+		for (int i = 0; i < sursa.nrNote; i++) {
+			cout << "Introdu nota " << i + 1 << ": ";
+			in >> sursa.note[i];
+		}
+
+		for (int i = 0; i < 5; i++) {
+			cout << "Introdu prezenta: " << i + 1 << ": ";
+			in >> sursa.prezente[i];
+		}
+		return in;
+	}
+	
 	//DESTRUCTOR
 	//dezaloca acele campuri cu * pentru a evita MEMORY LEAKS
 	~Student() {
@@ -529,15 +601,44 @@ int main()
 	s4(8);
 	s4[3];
 	if (s1 < s2) {
-		cout << "Media lui s1 este mai mica decat media lui s2";
+		cout << "Media lui s1 este mai mica decat media lui s2" << endl;
 	}
 	else {
-		cout << "Media lui s2 este mai mica decat media lui s1";
+		cout << "Media lui s2 este mai mica decat media lui s1" << endl;
 	}
 	if (s3 == s4) {
-		cout << "Aceeasi data de nastere!";
+		cout << "Aceeasi data de nastere!"<<endl;
 	}
 	else {
-		cout << "Diferite!";
+		cout << "Diferite!"<<endl;
 	}
+
+
+	///afisare in fisier
+	ofstream obiectAfisare;
+	string numeFisier;
+	cout << "Introduceti numele fisierului de la tastatura:";
+	cin >> numeFisier; //fisier.txt
+	obiectAfisare.open(numeFisier, ios::out);
+	if (obiectAfisare.is_open()) {
+		obiectAfisare << s4;
+	}
+	obiectAfisare.close();
+	//fisierul apare in folderul proiectului
+
+
+	//Bucla infinita undeva
+	////citire din fisierul creat mai sus
+	//ifstream obiectCitire;
+	//obiectCitire.open(numeFisier, ios::in);
+	//cout << "Citire din fisier text " << endl;
+	//if (obiectCitire.is_open()) {
+	//	while (!obiectCitire.eof()) {
+	//		Student student;
+	//		obiectCitire >> student;
+	//		cout << student;
+	//	}
+	//
+	//}
+	//obiectCitire.close();
 }

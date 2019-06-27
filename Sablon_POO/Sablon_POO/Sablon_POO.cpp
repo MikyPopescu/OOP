@@ -2,6 +2,11 @@
 #include <iostream>
 #include<string>
 #include<fstream> //pt fisier txt
+//STL (ultimul exercitiu)
+#include<vector>
+#include<list>
+#include<set>
+#include<map>
 using namespace std;
 //CRT_SECURE_NO_WARNINGS!
 
@@ -690,7 +695,7 @@ public:
 };
 int Student::contor = 0; //ATRIBUTUL STATIC SE INITIALIZEAZA MEREU LA FINALUL CLASEI
 
-//MOSTENIRE/DERIVARE
+//MOSTENIRE/DERIVARE/IS A
 class StudentMaster : public Student {
 	string master;
 	int nrExamene;
@@ -714,7 +719,6 @@ public:
 		}
 		cout << "S-a apelat constructorul cu param din Student Master" << endl;
 	}
-
 	//Apel main StudentMaster sm2(sm1)
 	StudentMaster( const StudentMaster & sursa):Student(sursa) {  
 		nume = sursa.nume;
@@ -882,12 +886,12 @@ int main()
 
 
 	//Try catch(PAS 3)
-	try {
-		s4.setNume("n/a"); //lungimea acestui nume <=5 deci va arunca exceptie
-	}
-	catch (ExceptieNume* e) {
-		s1.setNume(e->what()); //pt pointerul e apelez functia din clasa ExceptieNume
-	}
+	//try {
+	//	s4.setNume("n/a"); //lungimea acestui nume <=5 deci va arunca exceptie
+	//}
+	//catch (ExceptieNume* e) {
+	//	s1.setNume(e->what()); //pt pointerul e apelez functia din clasa ExceptieNume
+	//}
 
 
 
@@ -922,6 +926,65 @@ int main()
 
 
 	//Exercitiu Virtualizare (PAS 4)
-	s4.afisareVirtuala(); //afiseaza nume student +note
-	sm2.afisareVirtuala(); //afiseaza nume student + master
+	//s4.afisareVirtuala(); //afiseaza nume student +note
+	//sm2.afisareVirtuala(); //afiseaza nume student + master
+
+
+
+
+
+
+	///STL
+	//Vector int
+	vector<int> vect; //int* vect;
+	vect.push_back(1);
+	vect.push_back(2);
+	vect.push_back(3); // vect[3] = {1,2,3}
+	vect.pop_back(); //vect[2]={1,2}
+	for (int i = 0; i < vect.size(); i++) {
+		cout << vect[i] << endl;
+	}
+
+	//Vector obiecte
+	vector<Student> vectStudenti;
+	vectStudenti.push_back(s1);
+	vectStudenti.push_back(s2);
+	vectStudenti.push_back(s3);
+	vectStudenti.push_back(s4);
+	//vectStudenti.pop_back();
+	for (int i = 0; i < vect.size(); i++) {
+		cout << vect[i] << endl;
+	}
+	
+	
+	//List
+	list<int> l;
+	l.push_front(1);
+	l.push_back(3);
+	l.push_front(100);
+	l.push_front(50);
+	list<int>::iterator it;//int* it 
+	cout << "Parcurgere lista" << endl;
+	for (it = l.begin(); it != l.end(); it++) {
+		cout << *it << endl;
+	}
+	l.sort();
+	cout << "Parcurgere lista sortata crescator" << endl;
+	for (it = l.begin(); it != l.end(); it++) {
+		cout << *it << endl;
+	}
+	l.reverse();
+	cout << "Parcurgere lista sortata descrescator" << endl;
+	for (it = l.begin(); it != l.end(); it++) {
+		cout << *it << endl;
+	}
+
+	list<Student> listaStudenti;
+	listaStudenti.push_back(s1);
+	listaStudenti.push_front(s2);
+	listaStudenti.push_back(s1);
+	listaStudenti.push_front(s3);
+	listaStudenti.push_back(s4);
+
+
 }

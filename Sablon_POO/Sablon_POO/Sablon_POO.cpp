@@ -6,6 +6,21 @@ using namespace std;
 //CRT_SECURE_NO_WARNINGS!
 
 
+//try-catch (PAS 1)
+class ExceptieNume : public exception { // Creez o clasa ExceptieNume derivata din exception
+public:
+	string what() {  //metoda what arunca o exceptie daca lungimea numelui studentului este mai mica de 5
+		string numeValid;
+		cout << "da nume valid : ";
+		cin >> numeValid;
+		while (numeValid.length() <= 5) {
+			cout << "da nume valid : ";
+			cin >> numeValid;      //metoda lasa utilizatorul sa reintroduca un nume corect
+		}
+		return numeValid;
+	}
+};
+
 //definire clasa
 class Student {
 	//private continut vizibil doar in clasa, ca sa vedem continutul variabilelor private avem nevoie de metode get/set;
@@ -174,9 +189,14 @@ public:
 		return prezente;
 	}
 	
+
+	//try catch(PAS 2)
 	void setNume(string numeNou) {
-		if (numeNou.length() > 0) {
+		if (numeNou.length() > 5) {
 			nume = numeNou;
+		}
+		else {
+			throw new ExceptieNume(); //alocam exceptii care sa ne impuna sa dam un nume valid de la tastatura
 		}
 	}
 	void setDataNastere(const char dataNoua[11]) {
@@ -534,6 +554,110 @@ public:
 		return in;
 	}
 	
+	//scriere in fisier binar
+	void scrieBinar(string numeFisier, Student* studenti, int nrStudenti) {
+			ofstream scrie;
+			scrie.open(numeFisier, ios::out | ios::binary);
+			if (scrie.is_open()) {
+				scrie.write((char*)&nrStudenti, sizeof(int)); //pe prima linie se pune neaparat nr de obiecte
+				for (int i = 0; i < nrStudenti; i++) {
+				
+					//pun id-ul (int)
+					scrie.write((char*)&id, sizeof(int));
+					
+					//pun numele (string)
+					int dim = nume.length() + 1;
+					scrie.write((char*)&dim, sizeof(int)); //pun cate caractere am
+					scrie.write(nume.data(), dim * sizeof(char));
+					
+					//pun data nastere (vector static char)
+					dim = strlen(dataNastere) + 1;
+					scrie.write((char*)&dim, sizeof(int));
+					scrie.write(dataNastere, dim * sizeof(char));
+
+					//pun genul (un caracter) 
+					scrie.write((char*)&gen, sizeof(char));
+
+					//pun bursa (float)
+					scrie.write((char*)&bursa, sizeof(float));
+
+					//pun nr de note (int)
+					scrie.write((char*)&nrNote, sizeof(int));
+					
+					//pun vectorul de note (int*)
+					for (int i = 0; i < nrNote; i++) {
+						scrie.write((char*)&note[i], sizeof(int));
+					}
+
+					//pun vectorul de prezente (vector static bool)
+					for (int i = 0; i < 5; i++) {
+						scrie.write((char*)&prezente[i], sizeof(bool));
+					}
+				}
+
+				scrie.close();
+			}
+			else {
+				cout << "Fisierul nu s-a putut deschide" << endl;
+			}
+		
+		
+	}
+	//incarcare/citire din binar
+	Student* citesteBinar(string numeFisier, int& nrStudenti) {
+		if (numeFisier.length() > 0) {
+			Student* studenti = NULL;
+			ifstream citeste;
+			citeste.open(numeFisier, ios::in | ios::binary);
+			if (citeste.is_open()) {
+				//pe prima linie este numarul de elemente pus in scrieBinar
+				citeste.read((char*)&nrStudenti, sizeof(int));
+				studenti = new Student[nrStudenti];
+				for (int i = 0; i < nrStudenti; i++) {
+					
+					//citesc id (int)
+					citeste.read((char*)&id, sizeof(int));
+					
+					//citesc nume(string)
+					int dimNume;
+					citeste.read((char*)&dimNume,sizeof(int));
+					citeste.read((char*)&studenti[i].nume, sizeof(char)*dimNume);
+					
+					//citesc data nastere
+					int dimDataNastere;
+					citeste.read((char*)&dimDataNastere, sizeof(int));
+					citeste.read((char*)&studenti[i].dataNastere, sizeof(char)*dimDataNastere);
+
+					//citesc gen (char)
+					citeste.read((char*)&gen, sizeof(char));
+					
+					//citesc bursa
+					citeste.read((char*)&bursa, sizeof(float));
+					
+					//citesc nr note
+					citeste.read((char*)&nrNote, sizeof(int));
+					//citesc notele
+					studenti[i].note = new int[nrNote];
+					for (int j = 0; j < nrNote; j++) {
+						citeste.read((char*)&studenti[i].note[j], sizeof(int));
+					}
+					//prezentele
+					for (int j = 0; j < 5; j++) {
+						citeste.read((char*)&studenti[i].prezente[j], sizeof(bool));
+					}
+
+					studenti[i] = Student(nume, dataNastere, gen, bursa, nrNote, note, prezente);
+
+			
+				}
+				citeste.close();
+			}
+			else {
+				cout << "Fisierul nu s-a putut deschide " << endl;
+			}
+			return studenti;
+		}
+	}
 	//DESTRUCTOR
 	//dezaloca acele campuri cu * pentru a evita MEMORY LEAKS
 	~Student() {
@@ -542,7 +666,9 @@ public:
 		}
 	}
 };
-int Student::contor = 0; //ATRIBUTUL STATIC SE INITIALIZEAZA MEREU AICI
+int Student::contor = 0; //ATRIBUTUL STATIC SE INITIALIZEAZA MEREU LA FINALUL CLASEI
+
+
 int main()
 {
 	//apel constructor default
@@ -619,29 +745,56 @@ int main()
 
 
 	///afisare in fisier
-	ofstream obiectAfisare;
-	string numeFisier;
-	cout << "Introduceti numele fisierului de la tastatura:";
-	cin >> numeFisier; //fisier.txt
-	obiectAfisare.open(numeFisier, ios::out);
-	if (obiectAfisare.is_open()) {
-		obiectAfisare << s4;
-	}
-	obiectAfisare.close();
+	//ofstream obiectAfisare;
+	//string numeFisier;
+	//cout << "Introduceti numele fisierului de la tastatura:";
+	//cin >> numeFisier; //fisier.txt
+	//obiectAfisare.open(numeFisier, ios::out);
+	//if (obiectAfisare.is_open()) {
+	//	obiectAfisare << s4;
+	//}
+	//obiectAfisare.close();
 	//fisierul apare in folderul proiectului
 
 
 	//citire din fisier txt
 	ifstream obiectCitire;
-	obiectCitire.open("fisierCreatDeMine.txt", ios::in);
-	cout << "Citire din fisier text " << endl;
-	if (obiectCitire.is_open()) {
-		while (!obiectCitire.eof()) {
-			Student student;
-			obiectCitire >> student;
-			cout << student;
-		}
-	
+	//obiectCitire.open("fisierCreatDeMine.txt", ios::in);
+	//cout << "Citire din fisier text " << endl;
+	//if (obiectCitire.is_open()) {
+	//	while (!obiectCitire.eof()) {
+	//		Student student;
+	//		obiectCitire >> student;
+	//		cout << student;
+	//	}
+	//
+	//}
+	//obiectCitire.close();
+
+
+	//Try catch(PAS 3)
+	try {
+		s4.setNume("n/a"); //lungimea acestui nume <=5 deci va arunca exceptie
 	}
-	obiectCitire.close();
+	catch (ExceptieNume* e) {
+		s1.setNume(e->what()); //pt pointerul e apelez functia din clasa ExceptieNume
+	}
+
+
+
+
+	//problema pt char gen ori la citire/ori la scriere !
+	//scriere/salvare in fisier binar
+	Student* studenti = NULL;
+	int nr=2;
+	s4.scrieBinar("fisier.dat", studenti, nr);
+	//in folderul proiectului apare "fisier.dat"
+
+	//incarcare/citire din fisier binar
+	nr = 1;
+	Student* studenti2 = s4.citesteBinar("fisier.dat", nr);
+	for (int i = 0; i < nr; i++) {
+		cout << studenti2[i] << endl;
+	}
+
 }

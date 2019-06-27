@@ -21,14 +21,22 @@ public:
 	}
 };
 
+
+//Exercitiu Virtualizare (PAS 1)
+class Interfata {
+public:
+	virtual void afisareVirtuala() = 0;
+};
+
+
 //definire clasa
-class Student {
+class Student:public Interfata  { //pt ex de virtualizare PAS(2.1)
 	//private continut vizibil doar in clasa, ca sa vedem continutul variabilelor private avem nevoie de metode get/set;
 			//private e default;
 			//incapsularea presupune sa am date private
 	//public continut vizibil peste tot
 	//protected <=>public PENTRU CLASE MOSTENITE
-private:
+protected:  //am schimbat din ptivate in protected pt MOSTENIRE
 	//zona inaccesibila!
 	const int id; //const: odata initializat nu se mai schimba
 	static int contor; //static arata un comportament al clasei;o sa initializez id-ului studentului cu ajutorul acestui contor
@@ -71,7 +79,7 @@ public:
 	//CONSTRUCTOR CU TOTI PARAMETRII
 	//apel in main: Student s1("Nume","12.12.2012",'M',...)
 	//am folosit const char data pentru ca in main, in VS 2017 nu merge sa bagi un sir de caractere pur si simplu; daca se scoate const-ul apelul nu mai merge
-	Student(string num, const char data[11], char g, float burs, int nr, int* nt, bool prez[5]) :id(contor++) { //id-ul este initializat pe baza campului static
+	Student(int id,string num, const char data[11], char g, float burs, int nr, int* nt, bool prez[5]) :id(contor++) { //id-ul este initializat pe baza campului static
 		//fiecare camp din clasa va fi initializat cu valoarea din apelul constructorului
 		//exemplu de validare pe string, se poate folosi/ exclude
 		if (num.length()>0) {//daca exista num atunci initializez campul
@@ -646,7 +654,7 @@ public:
 						citeste.read((char*)&studenti[i].prezente[j], sizeof(bool));
 					}
 
-					studenti[i] = Student(nume, dataNastere, gen, bursa, nrNote, note, prezente);
+					studenti[i] = Student(id,nume, dataNastere, gen, bursa, nrNote, note, prezente);
 
 			
 				}
@@ -664,11 +672,112 @@ public:
 		if (note) {
 			delete[] note;
 		}
+		cout << "S-a apelat destructorul Student" << endl;
+	}
+
+
+
+	//Exercitiu Virtualizare (PAS 2.2)
+	virtual void afisareVirtuala() {
+		//afisez numele studentului+ notele
+		cout << "Nume STUDENT: " << nume << " are " << nrNote << " note"<<endl;
+		cout << "Notele:";
+		for (int i = 0; i < nrNote; i++) {
+			cout << note[i] << " ";
+		}
+		cout << endl;
 	}
 };
 int Student::contor = 0; //ATRIBUTUL STATIC SE INITIALIZEAZA MEREU LA FINALUL CLASEI
 
+//MOSTENIRE/DERIVARE
+class StudentMaster : public Student {
+	string master;
+	int nrExamene;
+	int* examene;
+public:
+	//Toate functiile constructor se apeleaza ascendent de la clasa de baza la clasa derivata
+	//Apel main: StudentMaster sm;
+	StudentMaster() :Student() {  //prima data se apeleaza constructorul default din clasa student, iar apoi constructorul fara param din clasa derivata
+		master = "n/a";
+		nrExamene = 0;
+		examene = NULL;
+		cout << "S-a apelat constructorul default din Student Master" << endl;
+	}
+	//Apel main: StudentMaster sm1(.......)
+	StudentMaster(int id, string num, const char data[11], const char g, float burs, int nr, int* nt, bool prez[5], string mast, int nrE, int* exam) :Student(id,nume,data,g,burs,nr,nt,prez) {
+		master = mast;
+		nrExamene = nrE;
+		examene = new int[nrE];
+		for (int i = 0; i < nrE; i++) {
+			examene[i] = exam[i];
+		}
+		cout << "S-a apelat constructorul cu param din Student Master" << endl;
+	}
 
+	//Apel main StudentMaster sm2(sm1)
+	StudentMaster( const StudentMaster & sursa):Student(sursa) {  
+		nume = sursa.nume;
+		strcpy(dataNastere, sursa.dataNastere);
+		gen = sursa.gen;
+		nrNote = sursa.nrNote;
+		bursa = sursa.bursa;
+		note = new int[sursa.nrNote];
+		for (int i = 0; i < sursa.nrNote; i++) {
+			note[i] = sursa.note[i];
+		}
+		for (int i = 0; i < 5; i++) {
+			prezente[i] = sursa.prezente[i];
+		}
+		master = sursa.master;
+		nrExamene = sursa.nrExamene;
+		examene = new int[sursa.nrExamene];
+		for (int i = 0; i < sursa.nrExamene; i++) {
+			examene[i] = sursa.examene[i];
+		}
+		cout << "S-a apelat constructorul de copiere din clasa Student Master" << endl;
+	}
+	//Apel: sm1=sm2
+	StudentMaster& operator=(const StudentMaster & sursa) {
+		if (note) {
+			delete[] note;
+		}
+		if (examene) {
+			delete[] examene;
+		}
+		nume = sursa.nume;
+		strcpy(dataNastere, sursa.dataNastere);
+		gen = sursa.gen;
+		nrNote = sursa.nrNote;
+		bursa = sursa.bursa;
+		note = new int[sursa.nrNote];
+		for (int i = 0; i < sursa.nrNote; i++) {
+			note[i] = sursa.note[i];
+		}
+		for (int i = 0; i < 5; i++) {
+			prezente[i] = sursa.prezente[i];
+		}
+		master = sursa.master;
+		nrExamene = sursa.nrExamene;
+		examene = new int[sursa.nrExamene];
+		for (int i = 0; i < sursa.nrExamene; i++) {
+			examene[i] = sursa.examene[i];
+		}
+		return *this; 
+	}
+	//Destructorul se apeleaza descendent de la clasa derivata la clasa de baza
+	~StudentMaster() {
+		if (examene) {
+			delete[] examene;
+		}
+		cout << "Destructor clasa Student Master" << endl;
+	}
+
+	virtual void afisareVirtuala() { //Exercitiu virtualizare (PAS 3)
+		//afisez numele studentului master + denumirea masterlui la care este
+		cout << "Nume STUDENT MASTER: " << nume<<" este student la "<<master<<endl;
+	}
+};
 int main()
 {
 	//apel constructor default
@@ -677,7 +786,7 @@ int main()
 	//apel constructor cu toti parametrii
 	int vectorNote[2] = { 7,8 };
 	bool vectorPrez[5] = { 1,1,1,0,0 };
-	Student s1("Gigel", "10.10.2003", 'M', 345, 2, vectorNote, vectorPrez); ///"10.10.2003" apare cu eroare daca scot constul din constructor
+	Student s1(1,"Gigel", "10.10.2003", 'M', 345, 2, vectorNote, vectorPrez); ///"10.10.2003" apare cu eroare daca scot constul din constructor
 	
     //apel constructor cu nr variabil de param
 	Student s2("Dorel", 3, new int[3]{ 7,8,5 });
@@ -706,7 +815,7 @@ int main()
 	}
 
 	//apel operator <<
-	Student s4("Ionel", "10.10.2000", 'M', 500, 2, vectorNote, vectorPrez);
+	Student s4(2,"Ionel", "10.10.2000", 'M', 500, 2, vectorNote, vectorPrez);
 	cout << s4;
 
 	//apel operator>>
@@ -783,7 +892,8 @@ int main()
 
 
 
-	//problema pt char gen ori la citire/ori la scriere !
+	//problema pt char gen/ int id!!!
+
 	//scriere/salvare in fisier binar
 	Student* studenti = NULL;
 	int nr=2;
@@ -797,4 +907,21 @@ int main()
 		cout << studenti2[i] << endl;
 	}
 
+
+
+	//DERIVARE MOSTENIRE APELURI
+	//constructor default
+	StudentMaster sm;
+	//constructor cu param
+	StudentMaster sm1(1, "Gabriel Popescu", "12.06.1996", 'M', 800, 2, new int[2]{ 6,8 }, new bool[5]{ 1,1,0,0,0 }, "IE", 5, new int[5]{ 1,2,3,1,2 });
+	//constructor de copiere
+	StudentMaster sm2(sm1);
+	//operator egal
+	sm = sm2;
+	//pentru a vedea continutul functiilor de mai sus este necesara supraincarcarea operatorului << in clasa StudentMaster
+
+
+	//Exercitiu Virtualizare (PAS 4)
+	s4.afisareVirtuala(); //afiseaza nume student +note
+	sm2.afisareVirtuala(); //afiseaza nume student + master
 }

@@ -2,7 +2,13 @@
 #include <iostream>
 #include<string>
 #include<fstream>
+#include<vector>
 using namespace std;
+//ex 7 -polimorfism
+class Interfata {
+public :
+	virtual void afisareVirtuala() = 0;
+};
 //ex 6
 class Exceptie :public exception {
 public:
@@ -29,8 +35,8 @@ public:
 	}
 
 };
-class Sala {
-private:
+class Sala : public Interfata{
+protected:
 	//ex 1
 	const int id;
 	static int nrSali;
@@ -99,7 +105,6 @@ public:
 			ocupate[i] = ocupNou[i];
 		}
 	}
-
 	void setPiesa(string piesaNoua) {
 		if (piesa.length() > 3) {
 			piesa = piesaNoua;
@@ -195,9 +200,97 @@ public:
 		return out;
 	}
 
+	//ex 7
+	void afisareVirtuala() {
+		cout << "Se afiseaza clasa Sala" << endl;
+	}
 
 };
 int Sala::nrSali = 0;
+
+//ex 7
+class SalaCinema :public Sala {
+	int nrFilmeInDerulare;
+	int* durate;
+public:
+	SalaCinema(): Sala(){
+		nrFilmeInDerulare = 0;
+		durate = NULL;
+	}
+	SalaCinema(int nrL, string den, bool* ocp, float pre, int nrF, int* dur) :Sala(nrL, ocp, den, pre) {
+		nrFilmeInDerulare = nrF;
+		durate = new int[nrF];
+		for (int i = 0; i < nrF; i++) {
+			durate[i] = dur[i];
+		}
+	}
+	SalaCinema(const SalaCinema& sursa) :Sala(sursa) {
+		nrFilmeInDerulare = sursa.nrFilmeInDerulare;
+		durate = new int[sursa.nrFilmeInDerulare];
+		for (int i = 0; i < sursa.nrFilmeInDerulare; i++) {
+			durate[i] = sursa.durate[i];
+		}
+	}
+	~SalaCinema() {
+		if (durate) {
+			delete[] durate;
+
+		}
+	}
+	SalaCinema& operator=(const SalaCinema& sursa) {
+		Sala::operator=(sursa);
+		if (durate) {
+			delete[] durate;
+		}
+		nrFilmeInDerulare = sursa.nrFilmeInDerulare;
+		durate = new int[nrFilmeInDerulare];
+		for (int i = 0; i < nrFilmeInDerulare; i++) {
+			durate[i] = sursa.durate[i];
+		}
+		return *this;
+	}
+	void adaugaFilmDurata(int durNoua) {
+		int* vn = new int[nrFilmeInDerulare + 1];
+		for (int i = 0; i < nrLocuri; i++) {
+			vn[i] = durate[i];
+		}
+		vn[nrFilmeInDerulare] = durNoua;
+		nrFilmeInDerulare++;
+	}
+	friend ostream& operator<<(ostream& out, SalaCinema& sursa) {
+		out << "Numarul de filme: " << sursa.nrFilmeInDerulare<<endl;
+		for (int i = 0; i < sursa.nrFilmeInDerulare; i++) {
+			out << sursa.durate[i] << " ";
+		}
+		out << "Nume: " << sursa.piesa << endl;
+		out << "Nr de locuri: " << sursa.nrLocuri << endl;
+		out << "Pret bilet: " << sursa.pretBilet << endl;
+		out << "Locurile sunt: ";
+		for (int i = 0; i < sursa.nrLocuri; i++) {
+			out << sursa.ocupate[i] << " ";
+		}
+		out << endl;
+		return out;
+	}
+	void afisareVirtuala() {
+		cout << "Se afiseaza clasa Sala cinema" << endl;
+	}
+
+};
+
+class Container {
+	vector<Sala> vectSali;
+public:
+
+	void adauga(Sala s, vector<Sala> vec) {
+		vec.push_back(s);
+	}
+	void afiseaza(vector<Sala> vect) {
+		for (int i = 0; i < vect.size(); i++) {
+			cout << vect[i] << endl;
+		}
+	}
+};
 int main()
 {
 	//Apeluri ex 2
@@ -208,7 +301,7 @@ int main()
 
 	//Apeluri ex 3
 	//cout << s.getNrSali();
-	s2.setPiesa("O noapte furtunoasa"); cout << s2.getPiesa() << endl;
+	/*s2.setPiesa("O noapte furtunoasa"); cout << s2.getPiesa() << endl;
 	s2.setPret(35.5); cout << s2.getPretBilet() << endl;
 	s2.setLocuri(3, new bool[3]{ 1,1,1 });
 	for (int i = 0; i < s2.getNrLocuri(); i++) {
@@ -217,11 +310,11 @@ int main()
 	cout << endl;
 	cout << s2.nrLocOcupate() << endl;
 	cout << s2.VenitTotal() << endl;
-	cout << s2.ProcentOcupare() << endl;
+	cout << s2.ProcentOcupare() << endl;*/
 
 
 	//Apeluri ex 4
-	s = s2;
+	/*s = s2;
 	cout << s;
 	if (s == s2) {
 		cout << "Piesele au acelasi pret" << endl;
@@ -229,7 +322,7 @@ int main()
 	else {
 		cout << "Preturi diferite!" << endl;
 	}
-	s2++; //adauga 5 lei la pretul biletului
+	s2++;*/ //adauga 5 lei la pretul biletului
 
 	//Apeluri ex 5
 	/*ofstream fout;
@@ -246,6 +339,7 @@ int main()
 	fout.close();*/
 
 	//Apeluri ex 6
+	//nu intra pe exceptie
 	//try {
 	//	s2.setPiesa("n");
 	//}
@@ -259,4 +353,18 @@ int main()
 	//catch (Exceptie e) {
 	//	s1.setPret(e.getPretBun());
 	//}
+
+	//Apeluri ex 7
+	SalaCinema sc;
+	//cout << sc;
+	//sc.afisareVirtuala();
+	//s1.afisareVirtuala();
+
+	//Apeluri ex 8 --nu afiseaza
+	vector<Sala> vectSali;
+	Container c;
+	c.adauga(s1,vectSali);
+	c.adauga(s2,vectSali);
+	c.afiseaza(vectSali);
+
 }

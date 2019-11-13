@@ -7,10 +7,6 @@ class Film {
 	float* incasari;
 
 	const int id;
-	
-	//reda un comportament al clasei
-	//deobicei numara obiectele
-
 public:
 	static int nr_filme;
 
@@ -33,7 +29,7 @@ public:
 		return nr_cinematografe;
 	}
 
-	//constructor cu toti param:
+	//constructor cu toti param
 	Film(int idDeTrimis, string num, float* incas, int nr):id(idDeTrimis) {
 		nume = num;
 		nr_cinematografe = nr;
@@ -88,9 +84,9 @@ public:
 		}
 		return out;
 	}
-	//destructor //nota 2!
 	
-	//operator egal!
+	
+	//operator egal
 	Film& operator=(const Film& sursa) {
 		if (incasari != NULL) {
 			delete[] incasari;
@@ -128,7 +124,8 @@ public:
 		return copie;
 	} 
 
-	//operator functie () pt nota 8
+	//operator functie () 
+	//nota 8
 	float operator()() {
 		float S = 0;
 		for (int i = 0;i < nr_cinematografe;i++) {
@@ -139,7 +136,7 @@ public:
 	
 	//operator INDEX
 	//nota 9
-	//se fol doar pt vectori
+	//se foloseste doar pt vectori
 	float& operator[](int index) {
 		if (incasari != NULL && index >= 0 && index < nr_cinematografe) {
 			return incasari[index];
@@ -156,6 +153,7 @@ public:
 			return 0;
 		}
 	}
+	//destructor //nota 2!
 	~Film() {
 		if (incasari != NULL) {
 			delete[] incasari;
